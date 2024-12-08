@@ -9,7 +9,6 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: url('bg.jpg') center center / cover no-repeat;
-  /* Updated to use the uploaded image */
   color: #517A06;
   box-sizing: border-box;
 }
