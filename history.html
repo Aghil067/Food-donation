@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donation History</title>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">Your Donation History</h1>
+
+    <!-- Donation List Container -->
+    <div id="historyContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Dynamic donation cards will appear here -->
+    </div>
+  </div>
+
+  <script type="module">
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxRO_0YAQTRB3gxTckx0KItIPORAg8ttc",
+      authDomain: "fooddonor-bf134.firebaseapp.com",
+      projectId: "fooddonor-bf134",
+      storageBucket: "fooddonor-bf134.firebasestorage.app",
+      messagingSenderId: "181553649704",
+      appId: "1:181553649704:web:ca39c2056abe3fabec3d1d"
+    };
+
+    // Initialize Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Fetch Donations from Firebase
+    const historyContainer = document.getElementById("historyContainer");
+    const donationsRef = ref(db, 'donation');
+
+    onValue(donationsRef, (snapshot) => {
+      const data = snapshot.val();
+      historyContainer.innerHTML = ""; // Clear container before adding new elements
+
+      if (data) {
+        Object.keys(data).forEach(key => {
+          const donation = data[key];
+          const donationCard = `
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <h2 class="text-lg font-bold mb-2 text-gray-800">${donation.name}</h2>
+              <p class="text-gray-600 mb-1"><strong>Phone:</strong> ${donation.phone}</p>
+              <p class="text-gray-600 mb-1"><strong>Address:</strong> ${donation.address}</p>
+              <p class="text-gray-600 mb-1"><strong>Food Type:</strong> ${donation.foodtype}</p>
+              <p class="text-gray-600 mb-1"><strong>Quantity:</strong> ${donation.quantity}</p>
+              <p class="text-gray-600 mb-1"><strong>Expiry Date:</strong> ${donation.expirydate}</p>
+              <p class="text-gray-600"><strong>Comments:</strong> ${donation.comments || "No comments"}</p>
+            </div>
+          `;
+          historyContainer.innerHTML += donationCard;
+        });
+      } else {
+        historyContainer.innerHTML = `
+          <p class="text-center text-gray-600">No donations found. Start donating today!</p>
+        `;
+      }
+    });
+  </script>
+</body>
+
+</html>

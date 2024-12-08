@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxRO_0YAQTRB3gxTckx0KItIPORAg8ttc",
+      authDomain: "fooddonor-bf134.firebaseapp.com",
+      projectId: "fooddonor-bf134",
+      storageBucket: "fooddonor-bf134.firebasestorage.app",
+      messagingSenderId: "181553649704",
+      appId: "1:181553649704:web:ca39c2056abe3fabec3d1d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Populate Welcome Message
+    function fetchUserName() {
+      const userRef = ref(database, 'users/currentUser'); // Replace with the path for user name
+      onValue(userRef, (snapshot) => {
+        const userName = snapshot.val() || "User";
+        document.getElementById("welcomeMessage").textContent = `Welcome, ${userName}!`;
+      });
+    }
+
+    // Populate Donation Stats
+    function fetchDonationStats() {
+      const donationRef = ref(database, 'donations'); // Replace with the path for donations
+      const labels = [];
+      const data = [];
+      onValue(donationRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const donation = childSnapshot.val();
+          labels.push(donation.date);
+          data.push(donation.amount);
+        });
+        renderChart(labels, data);
+      });
+    }
+
+    // Render Donation Chart
+    function renderChart(labels, data) {
+      const ctx = document.getElementById('donationChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Donations',
+            data: data,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    // Fetch Achievements
+    function fetchAchievements() {
+      const achievementsRef = ref(database, 'achievements'); // Replace with the path for achievements
+      const achievementsList = document.getElementById('achievementsList');
+      onValue(achievementsRef, (snapshot) => {
+        achievementsList.innerHTML = ""; // Clear existing list
+        snapshot.forEach((childSnapshot) => {
+          const achievement = childSnapshot.val();
+          const listItem = document.createElement('li');
+          listItem.textContent = achievement; // Assuming achievements are plain strings
+          achievementsList.appendChild(listItem);
+        });
+      });
+    }
+
+    // Initialize Page
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchUserName();
+      fetchDonationStats();
+      fetchAchievements();
+    });
+  </script>
+  <style>
+    .box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px 20px;
+      gap: 40px;
+    }
+
+    .img1 {
+      height: 400px;
+      width: 500px;
+      margin-top: 18px;
+    }
+
+    .img2 {
+      height: 380px;
+      width: 500px;
+    }
+
+    @media (max-width: 768px) {
+      .box{
+        gap: 40px;
+      }
+      .img1 {
+      height: 100px;
+      width: 250px;
+      }
+
+      .img2 {
+      height: 100px;
+      width: 120px;
+    }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <div class="container mx-auto p-6">
+    <!-- Welcome Banner -->
+    <div class="bg-blue-500 text-white p-6 rounded-lg shadow-lg mb-6">
+      <h1 id="welcomeMessage" class="text-3xl font-bold">Welcome, User!</h1>
+      <p class="mt-2">We're glad to have you here. Let's make a difference together!</p>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <a href="dhere.html" class="bg-white p-4 rounded-lg shadow hover:bg-blue-100 transition text-center">
+        <h2 class="text-lg font-bold">Donate Now</h2>
+      </a>
+      <a href="history.html" class="bg-white p-4 rounded-lg shadow hover:bg-blue-100 transition text-center">
+        <h2 class="text-lg font-bold">View History</h2>
+      </a>
+      <a href="notification.html" class="bg-white p-4 rounded-lg shadow hover:bg-blue-100 transition text-center">
+        <h2 class="text-lg font-bold">Notifications</h2>
+      </a>
+    </div>
+
+    <!-- Interactive Chart -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+      <h2 class="text-xl font-bold mb-4">Donation Stats</h2>
+      <canvas id="donationChart" class="w-full h-64"></canvas>
+    </div>
+
+    <!-- Achievements -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+      <h2 class="text-xl font-bold mb-4">Your Achievements</h2>
+      <ul id="achievementsList" class="list-disc pl-6 text-gray-700"></ul>
+    </div>
+
+    <!-- Why Donate Food -->
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 class="text-xl font-bold mb-4">Why We Need to Donate Food</h2>
+      <p class="text-gray-700">
+        Food donation is an impactful way to fight hunger and reduce food waste. Every donation helps a family in need,
+        spreading hope and care in the community. Together, we can create a more compassionate and equitable world.
+
+        Here are some statistics on food waste in India:
+        Amount of food wasted
+        In 2022-23, India wasted 74 million tonnes of food, which is 22% of the country's foodgrain output. This is
+        second only to China in terms of household food waste.
+        Per capita food waste
+        The UN estimates that the average Indian person wastes 55 kg of food per year.
+        Value of food waste
+        The value of food waste in India is estimated to be around ₹92,000 crores per year.
+        Food waste and hunger
+        India ranks high on the Global Hunger Index, with 14% of Indians undernourished.
+        Food waste and climate change
+        Food waste contributes to climate change because rotting food in landfills emits methane, a greenhouse gas
+        that's 80 times more potent than carbon dioxide.
+        Some reasons for food waste in India include:
+        Inadequate storage facilities
+        People wasting food deliberately or not being aware of it
+        Some ways to reduce food waste include:
+        Improving family values, such as consumption habits, awareness, and appreciation of food
+        Purchasing and cooking in appropriate quantities
+      </p>
+      <div class="box">
+        <img src="Blue Green Minimalist Food Donation Instagram Story.png" alt="" class="img1">
+        <img src="https://timesofagriculture.in/wp-content/uploads/2023/09/Food-Wastage-in-India-data.jpg" alt=""
+          class="img2">
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
