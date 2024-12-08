@@ -42,27 +42,24 @@
       appId: "1:181553649704:web:ca39c2056abe3fabec3d1d"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     document.getElementById("sub").addEventListener("click", function (e) {
       e.preventDefault();
 
-      // Get user inputs
+  
       const email = document.getElementById("em").value;
       const password = document.getElementById("pas").value;
 
-      // Encode email to make it Firebase-compatible
       const encodedEmail = email.replace(/\./g, ',');
 
-      // Set data in the database
       set(ref(db, 'user/' + encodedEmail), {
         em: email,
         pas: password
       })
         .then(() => {
           alert("Login success");
-          window.location.href = "do.html"; // Redirect to do.html
+          window.location.href = "do.html"; 
         })
         .catch((error) => {
           alert("Error: " + error.message);
